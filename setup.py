@@ -18,7 +18,7 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'script_manager=main:start',  # Example command
+            'scm=main:start',  # Example command
         ],
     },
     license="Apache 2.0",                    # Specify Apache 2.0 License
