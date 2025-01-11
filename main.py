@@ -30,7 +30,7 @@ def remove_category(category_name):
 
 def get_categories():
     """Retrieve the list of categories from the directory."""
-    return [f[:-4] for f in os.listdir(CATEGORY_DIR) if f.endswith('.txt')]  # Remove .txt extension
+    return [f[:-4] for f in os.listdir(CATEGORY_DIR) if f.endswith('.txt')]
 
 def add_line(filename, new_line):
     with open(filename, 'a') as file:
@@ -63,11 +63,10 @@ def execute_command(option):
 
     """Example command execution based on the selected option."""
     stdscr.addstr(f"You selected: {option}\n")
-    commands = read_file_to_array('./categories/' + option + '.txt')
+    commands = read_file_to_array(os.path.join(CATEGORY_DIR, f"{option}.txt"))
     display_menu(stdscr, commands, run_command)
     stdscr.refresh()
     stdscr.getch()  # Wait for a key press to allow the user to see the message
-
 
 def display_output(stdscr, output):
     """Display command output in the curses window."""
@@ -90,31 +89,6 @@ def display_menu1(stdscr, options, selected):
 
     stdscr.refresh()  # Refresh the screen to show changes
 
-import subprocess
-
-def create_category_directory():
-    """Create the categories directory if it doesn't exist."""
-    if not os.path.exists(CATEGORY_DIR):
-        os.makedirs(CATEGORY_DIR)
-
-def add_category(category_name):
-    """Add a category by creating a file with the category name."""
-    file_path = os.path.join(CATEGORY_DIR, f"{category_name}.txt")
-    with open(file_path, 'w') as file:
-        file.write(f"")  # Optional: add initial content
-    return category_name
-
-def remove_category(category_name):
-    """Remove a category by deleting the file with the category name."""
-    file_path = os.path.join(CATEGORY_DIR, f"{category_name}.txt")
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        return category_name
-    return category_name
-
-def get_categories():
-    """Retrieve the list of categories from the directory."""
-    return [f[:-4] for f in os.listdir(CATEGORY_DIR) if f.endswith('.txt')]  # Remove .txt extension
 
 def add_line(filename, new_line):
     with open(filename, 'a') as file:
@@ -132,17 +106,6 @@ def remove_line(filename, line_number):
     with open(filename, 'w') as file:
         file.writelines(lines)
 
-def read_file_to_array(file_path):
-    try:
-        with open(file_path, 'r') as file:  # Open the file in read mode
-            lines = file.readlines()  # Read all lines into a list
-        return [line.strip() for line in lines]  # Strip newline characters from each line
-    except FileNotFoundError:
-        print(f"The file {file_path} was not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
 def display_menu(stdscr, options, execute_command, types):
     """
     Display a menu using curses, allowing the user to navigate with arrow keys
@@ -158,9 +121,6 @@ def display_menu(stdscr, options, execute_command, types):
     while True:
         stdscr.clear()  # Clear the screen for redrawing the menu
         stdscr.addstr("Select an option (Use arrow keys and press Enter): \n\n")
-        stdscr.addstr(str(selected))
-        stdscr.addstr(options[selected])
-        stdscr.addstr("\n")
         for idx, option in enumerate(options):
             if idx == selected:
                 stdscr.addstr(f"> {option}\n", curses.A_REVERSE)  # Highlight selected option
@@ -196,9 +156,10 @@ def display_menu(stdscr, options, execute_command, types):
                     stdscr.addstr("\nEnter the command to add: ")
                     stdscr.refresh()
                     curses.echo()  # Enable echoing of user input
-                    new_command = stdscr.getstr().decode('utf-8')  # Get the new command to add
-                    add_line(types[1], new_command)
-                    stdscr.addstr(f"\Command added\n: '{new_command}'\n")
+                    new_command = stdscr.getstr().decode('utf-8').strip()  # Get the new command to add
+                    if new_command:
+                        add_line(types[1], new_command)
+                        stdscr.addstr(f"\Command added\n: '{new_command}'\n")
                     stdscr.refresh()
                     return
                 elif selected == len(options) - 2:  # Remove Category option (second last)
@@ -220,7 +181,7 @@ def execute_command(option):
 
     """Example command execution based on the selected option."""
     stdscr.addstr(f"You selected: {option}\n")
-    commands = read_file_to_array('./categories/' + option + '.txt')
+    commands = read_file_to_array(os.path.join(CATEGORY_DIR, f"{option}.txt"))
     display_menu(stdscr, commands, run_command)
     stdscr.refresh()
     stdscr.getch()  # Wait for a key press to allow the user to see the message
@@ -261,7 +222,7 @@ def main(stdscr):
         elif key == curses.KEY_ENTER or key in [10, 13]:  # Enter key
             if selected < len(options) - 3:
                 option = options[selected]
-                path = './categories/' + option + '.txt'
+                path = os.path.join(CATEGORY_DIR, f"{option}.txt")
                 commands = read_file_to_array(path)
                 commands += command_option
                 display_menu(stdscr, commands, run_command, ['run_command', path])
@@ -270,9 +231,10 @@ def main(stdscr):
                 stdscr.addstr("\nEnter the name of the new category: ")
                 stdscr.refresh()
                 curses.echo()  # Enable echoing of user input
-                category_name = stdscr.getstr().decode('utf-8')  # Get the category name
-                add_category(category_name)  # Add the category
-                stdscr.addstr(f"\nCategory '{category_name}' added!\n")
+                category_name = stdscr.getstr().decode('utf-8').strip()  # Get the category name
+                if category_name:
+                    add_category(category_name)  # Add the category
+                    stdscr.addstr(f"\nCategory '{category_name}' added!\n")
                 stdscr.refresh()
             elif selected == len(options) - 2:  # Remove Category option (second last)
                 stdscr.addstr("\nSelect a category to remove:\n")
