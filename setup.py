@@ -8,8 +8,8 @@ def read_file():
 
 
 setup(
-    name="command-manager",
-    version="0.1.0",
+    name="command-manager-util",
+    version="0.1.1",
     description="This manages all the usesful commands at one place",
     long_description=read_file(),
     long_description_content_type="text/markdown",
