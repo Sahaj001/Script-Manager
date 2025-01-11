@@ -1,3 +1,4 @@
+[![Publish Python Package to PyPI](https://github.com/Sahaj001/Script-Manager/actions/workflows/publish.yml/badge.svg)](https://github.com/Sahaj001/Script-Manager/actions/workflows/publish.yml)
 # Script Manager
 
 ## Overview
