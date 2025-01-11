@@ -1,10 +1,17 @@
-from setuptools import setup, find_packages
+from setuptools import setup
+
+
+def read_file():
+    with open("README.md", "r", encoding='utf-8') as f:
+        content = f.read()
+    return content
+
 
 setup(
     name="command-manager",
     version="0.1.0",
     description="This manages all the usesful commands at one place",
-    long_description=open('README.md').read(),
+    long_description=read_file(),
     long_description_content_type="text/markdown",
     author="Sahaj Pratap Singh",
     url="https://github.com/Sahaj001/Script-Manager",
