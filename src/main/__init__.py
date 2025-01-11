@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# main.py
 
 import os
 import curses
@@ -8,10 +8,12 @@ import sys
 script_dir = os.path.dirname(os.path.realpath(__file__))
 CATEGORY_DIR = os.path.join(script_dir, 'categories')
 
+
 def create_category_directory():
     """Create the categories directory if it doesn't exist."""
     if not os.path.exists(CATEGORY_DIR):
         os.makedirs(CATEGORY_DIR)
+
 
 def add_category(category_name):
     """Add a category by creating a file with the category name."""
@@ -19,6 +21,7 @@ def add_category(category_name):
     with open(file_path, 'w') as file:
         file.write(f"")  # Optional: add initial content
     return category_name
+
 
 def remove_category(category_name):
     """Remove a category by deleting the file with the category name."""
@@ -28,35 +31,41 @@ def remove_category(category_name):
         return category_name
     return category_name
 
+
 def get_categories():
     """Retrieve the list of categories from the directory."""
     return [f[:-4] for f in os.listdir(CATEGORY_DIR) if f.endswith('.txt')]
+
 
 def add_line(filename, new_line):
     with open(filename, 'a') as file:
         file.write(new_line + '\n')  # Append new line with a newline character
 
+
 def remove_line(filename, line_number):
     with open(filename, 'r') as file:
         lines = file.readlines()
-    
+
     # Check if the line number is valid
     if 0 <= line_number <= len(lines):
         del lines[line_number]
-    
+
     # Write back to the file without leaving any blank spaces
     with open(filename, 'w') as file:
         file.writelines(lines)
+
 
 def read_file_to_array(file_path):
     try:
         with open(file_path, 'r') as file:  # Open the file in read mode
             lines = file.readlines()  # Read all lines into a list
-        return [line.strip() for line in lines]  # Strip newline characters from each line
+        # Strip newline characters from each line
+        return [line.strip() for line in lines]
     except FileNotFoundError:
         print(f"The file {file_path} was not found.")
     except Exception as e:
         print(f"An error occurred: {e}")
+
 
 def execute_command(option):
     stdscr = curses.initscr()
@@ -68,22 +77,26 @@ def execute_command(option):
     stdscr.refresh()
     stdscr.getch()  # Wait for a key press to allow the user to see the message
 
+
 def display_output(stdscr, output):
     """Display command output in the curses window."""
     stdscr.clear()  # Clear the screen
     for line in output:
-        stdscr(line+ '\n')
+        stdscr(line + '\n')
         # stdscr.addstr(line + '\n')  # Add each line followed by a newline
     stdscr.refresh()  # Refresh to show the updated content
     stdscr.getch()  # Wait for a key press
 
+
 def display_menu1(stdscr, options, selected):
     stdscr.clear()  # Clear the screen
-    stdscr.addstr("Select a command category (Use arrow keys and press Enter):\n\n")
-    
+    stdscr.addstr(
+        "Select a command category (Use arrow keys and press Enter):\n\n")
+
     for idx, option in enumerate(options):
         if idx == selected:
-            stdscr.addstr(f"> {option}\n", curses.A_REVERSE)  # Highlight selected option
+            # Highlight selected option
+            stdscr.addstr(f"> {option}\n", curses.A_REVERSE)
         else:
             stdscr.addstr(f"  {option}\n")
 
@@ -94,23 +107,25 @@ def add_line(filename, new_line):
     with open(filename, 'a') as file:
         file.write(new_line + '\n')  # Append new line with a newline character
 
+
 def remove_line(filename, line_number):
     with open(filename, 'r') as file:
         lines = file.readlines()
-    
+
     # Check if the line number is valid
     if 0 <= line_number <= len(lines):
         del lines[line_number]
-    
+
     # Write back to the file without leaving any blank spaces
     with open(filename, 'w') as file:
         file.writelines(lines)
+
 
 def display_menu(stdscr, options, execute_command, types):
     """
     Display a menu using curses, allowing the user to navigate with arrow keys
     and execute a command based on the selected option.
-    
+
     :param stdscr: The window object from curses.
     :param options: A list of options to display in the menu.
     :param execute_command: A function to execute when an option is selected.
@@ -120,10 +135,12 @@ def display_menu(stdscr, options, execute_command, types):
 
     while True:
         stdscr.clear()  # Clear the screen for redrawing the menu
-        stdscr.addstr("Select an option (Use arrow keys and press Enter): \n\n")
+        stdscr.addstr(
+            "Select an option (Use arrow keys and press Enter): \n\n")
         for idx, option in enumerate(options):
             if idx == selected:
-                stdscr.addstr(f"> {option}\n", curses.A_REVERSE)  # Highlight selected option
+                # Highlight selected option
+                stdscr.addstr(f"> {option}\n", curses.A_REVERSE)
             else:
                 stdscr.addstr(f"  {option}\n")
 
@@ -137,7 +154,8 @@ def display_menu(stdscr, options, execute_command, types):
             selected = (selected + 1) % num_options
         elif key in [curses.KEY_ENTER, 10, 13]:  # Enter key
             if types[0] == 'remove':
-                output = execute_command(options[selected])  # Capture the output of the command
+                # Capture the output of the command
+                output = execute_command(options[selected])
                 return output
             elif types[0] == 'remove_command':
                 execute_command(types[1], selected)
@@ -151,22 +169,25 @@ def display_menu(stdscr, options, execute_command, types):
                 if selected < len(options) - 3:
                     # Run the command and wait for it to complete
                     run_command(options[selected])
-                    return                    
+                    return
                 elif selected == len(options) - 3:  # Add Category option
                     stdscr.addstr("\nEnter the command to add: ")
                     stdscr.refresh()
                     curses.echo()  # Enable echoing of user input
-                    new_command = stdscr.getstr().decode('utf-8').strip()  # Get the new command to add
+                    new_command = stdscr.getstr().decode(
+                        'utf-8').strip()  # Get the new command to add
                     if new_command:
                         add_line(types[1], new_command)
-                        stdscr.addstr(f"\Command added\n: '{new_command}'\n")
+                        stdscr.addstr(f"\\Command added\n: '{new_command}'\n")
                     stdscr.refresh()
                     return
-                elif selected == len(options) - 2:  # Remove Category option (second last)
+                # Remove Category option (second last)
+                elif selected == len(options) - 2:
                     stdscr.addstr("\nSelect a command to remove:\n")
                     stdscr.refresh()
                     curses.noecho()  # Disable echoing for the category selection
-                    cat = display_menu(stdscr, options[:-3], remove_line, ['remove_command', types[1]])
+                    cat = display_menu(
+                        stdscr, options[:-3], remove_line, ['remove_command', types[1]])
                     stdscr.addstr(f"\nCategory '{cat}' removed!\n")
                     selected = selected - 1
                     stdscr.refresh()
@@ -175,6 +196,7 @@ def display_menu(stdscr, options, execute_command, types):
                     stdscr.addstr("\nExiting...\n")
                     stdscr.refresh()
                     return
+
 
 def execute_command(option):
     stdscr = curses.initscr()
@@ -186,19 +208,22 @@ def execute_command(option):
     stdscr.refresh()
     stdscr.getch()  # Wait for a key press to allow the user to see the message
 
+
 def run_command(command):
     try:
         curses.endwin()
         print("\n")
         os.system(command)
         print("\n")
-        os.system("read -p 'Press Enter to exit.'")  # Pause for user to see output
+        # Pause for user to see output
+        os.system("read -p 'Press Enter to exit.'")
         sys.exit()
     except subprocess.CalledProcessError as e:
         print(f"Command '{command}' failed with exit code {e.returncode}")
         print("Error Output:")
         print(e.stderr)
-# 
+#
+
 
 def main(stdscr):
     create_category_directory()  # Ensure the category directory exists
@@ -225,7 +250,9 @@ def main(stdscr):
                 path = os.path.join(CATEGORY_DIR, f"{option}.txt")
                 commands = read_file_to_array(path)
                 commands += command_option
-                display_menu(stdscr, commands, run_command, ['run_command', path])
+                display_menu(
+                    stdscr, commands, run_command, [
+                        'run_command', path])
                 stdscr.refresh()
             elif selected == len(options) - 3:  # Add Category option
                 stdscr.addstr("\nEnter the name of the new category: ")
@@ -236,11 +263,13 @@ def main(stdscr):
                     add_category(category_name)  # Add the category
                     stdscr.addstr(f"\nCategory '{category_name}' added!\n")
                 stdscr.refresh()
-            elif selected == len(options) - 2:  # Remove Category option (second last)
+            # Remove Category option (second last)
+            elif selected == len(options) - 2:
                 stdscr.addstr("\nSelect a category to remove:\n")
                 stdscr.refresh()
                 curses.noecho()  # Disable echoing for the category selection
-                cat = display_menu(stdscr, options[:-3], remove_category, ['remove'])
+                cat = display_menu(
+                    stdscr, options[:-3], remove_category, ['remove'])
                 stdscr.addstr(f"\nCategory '{cat}' removed!\n")
                 selected = selected - 1
                 stdscr.refresh()
@@ -249,5 +278,5 @@ def main(stdscr):
                 stdscr.refresh()  # Refresh to show the exit message
                 return  # Exit the main function, terminating the program
 
-if __name__ == "__main__":
+def start():
     curses.wrapper(main)

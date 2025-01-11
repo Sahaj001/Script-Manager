@@ -1,0 +1,11 @@
+# Include essential files
+include README.md
+include LICENSE
+include setup.py
+
+# Exclude unwanted files
+exclude *.pyc
+exclude .DS_Store
+
+# Exclude the tests directory
+prune tests
