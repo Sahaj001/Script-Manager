@@ -1,16 +1,31 @@
+"""
+Setup configuration for the S-Command-Manager (SCM) package.
+
+This script uses setuptools to manage the installation, packaging, and 
+distribution of SCM. It defines the 'scm' entry point, allowing the 
+logic to be executed as a standalone CLI tool.
+
+Key Features:
+    - Defines a console script entry point 'scm' mapping to main:start.
+    - Configured for local 'editable' installation for development.
+
+Author: Sahaj Pratap Singh
+License: Apache License 2.0
+"""
 from setuptools import setup
 
-
 def read_file():
-    with open("README.md", "r", encoding='utf-8') as f:
-        content = f.read()
-    return content
-
+    """Read the README file."""
+    try:
+        with open("README.md", "r", encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return "Command manager using fzf"
 
 setup(
     name="command-manager-util",
-    version="0.1.1",
-    description="This manages all the usesful commands at one place",
+    version="1.0.0",
+    description="Manages useful commands in one place using fzf",
     long_description=read_file(),
     long_description_content_type="text/markdown",
     author="Sahaj Pratap Singh",
@@ -25,8 +40,8 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'scm=main:start',  # Example command
+            'scm=main:main', 
         ],
     },
-    license="Apache 2.0",                    # Specify Apache 2.0 License
+    license="Apache 2.0",
 )
