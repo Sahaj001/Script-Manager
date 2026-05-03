@@ -1,6 +1,21 @@
+"""
+Setup configuration for the S-Command-Manager (SCM) package.
+
+This script uses setuptools to manage the installation, packaging, and 
+distribution of SCM. It defines the 'scm' entry point, allowing the 
+logic to be executed as a standalone CLI tool.
+
+Key Features:
+    - Defines a console script entry point 'scm' mapping to main:start.
+    - Configured for local 'editable' installation for development.
+
+Author: Sahaj Pratap Singh
+License: Apache License 2.0
+"""
 from setuptools import setup
 
 def read_file():
+    """Read the README file."""
     try:
         with open("README.md", "r", encoding='utf-8') as f:
             return f.read()
