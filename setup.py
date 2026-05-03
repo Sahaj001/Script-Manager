@@ -1,16 +1,16 @@
 from setuptools import setup
 
-
 def read_file():
-    with open("README.md", "r", encoding='utf-8') as f:
-        content = f.read()
-    return content
-
+    try:
+        with open("README.md", "r", encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return "Command manager using fzf"
 
 setup(
     name="command-manager-util",
-    version="0.1.1",
-    description="This manages all the usesful commands at one place",
+    version="1.0.0",
+    description="Manages useful commands in one place using fzf",
     long_description=read_file(),
     long_description_content_type="text/markdown",
     author="Sahaj Pratap Singh",
@@ -25,8 +25,8 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'scm=main:start',  # Example command
+            'scm=main:main', 
         ],
     },
-    license="Apache 2.0",                    # Specify Apache 2.0 License
+    license="Apache 2.0",
 )

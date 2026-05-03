@@ -1,37 +1,89 @@
 [![Publish Python Package to PyPI](https://github.com/Sahaj001/Script-Manager/actions/workflows/publish.yml/badge.svg)](https://github.com/Sahaj001/Script-Manager/actions/workflows/publish.yml)
-# Script Manager
+
+# Script-Command-Manager (SCM)
+# 🚀 SCM Tool Guide
+
+A streamlined command manager for your terminal workflows.
 
 ## Overview
 
-The **Script Manager** is a tool designed to help users organize and execute commands with ease. It allows you to create and manage categories, add or remove commands within those categories, and execute them directly. This tool is ideal for those who work with long or complex commands and prefer not to remember them or store them in multiple places.
+**SCM** is a high-performance CLI tool designed to catalog, manage, and execute complex shell commands through an intuitive fuzzy-finding interface. Built with Python and powered by `fzf`, it eliminates the need to remember arcane syntax or sift through endless history files.
 
 ## Features
+*   **Fuzzy Search Navigation**: Instant filtering of categories and commands using `fzf`.
+*   **Hierarchical Management**: Organize commands into custom categories (e.g., Work, Dev, Personal).
+*   **In-App Administration**: Add or delete commands and entire categories directly from the interface.
+*   **Shell History Integration**: Commands executed via SCM can be injected into your shell history for easy access later.
+*   **Mac-Optimized Core**: Robust file I/O designed to handle macOS-specific shell environments and `sed/grep` variations.
 
-- **Category Management**: Create and remove categories to organize your commands.
-- **Command Management**: Add and remove commands within categories as needed.
-- **Command Execution**: Select and run commands directly from the tool.
-- **No External Storage**: All commands and categories are stored within the tool itself.
-- **Easy to Use**: A simple interface for easy command management.
+---
 
 ## Installation
 
-Follow the installation steps in the repository to set up the Script Manager on your system.
+### Prerequisites
+1.  **Python**: 3.6 or higher.
+2.  **fzf**: Must be installed on your system.
+    ```bash
+    brew install fzf
+    ```
 
-## Usage
+### Local Setup
+1.  Clone the repository:
+    ```bash
+    git clone [https://github.com/Sahaj001/Script-Manager.git](https://github.com/Sahaj001/Script-Manager.git)
+    cd Script-Manager
+    ```
+2.  Install in editable mode:
+    ```bash
+    pip install -e .
+    ```
 
-Once installed, you can use the Script Manager to manage your commands.
+---
 
-- Create and organize categories.
-- Add or remove commands within those categories.
-- Execute commands directly with a simple interface.
+## Configuration
 
-## Benefits
+To enable command execution and history injection, add the following wrapper to your `~/.zshrc` or `~/.bashrc`:
+```bash
+### SCM START ###
+rscm() {
+    local result=$(scm)
+    if [[ -n "$result" ]]; then
+        eval " $result"
+    fi
+}
+alias s='rscm'
+### SCM END ###
+```
 
-- **Simplified Workflow**: Easily manage and execute commands without needing to remember them.
-- **No External Files Needed**: Everything stays within the tool, making it easy to maintain and backup.
-- **Time-Saving**: Run your commands with a few simple actions, eliminating the need for manual typing.
-- **Minimal Setup**: Get started quickly with no complex configurations.
 
-## Contributing
+---
+### 🚀 Usage
+> **Note**
+> Simply type `s` or `run_scm` in your terminal to launch the interactive menu.
 
-Feel free to fork the repository and contribute to the project.
+
+---
+
+## 🛠 Features & Navigation
+
+*   **Select a Category:** Use the **arrow keys** to navigate or **start typing** to filter through your existing groups.
+*   **Execute:** Choose a specific command and hit `Enter` to run it directly in your current shell.
+*   **Management:**
+    *   `[+ Add New Category]` — Create a new group for your commands.
+    *   `[+ Add Command to...]` — Expand your library within a specific category.
+    *   `[-] Delete` — Prune old or unused commands and groups.
+
+---
+
+
+## 🤝 Contributing
+
+Contributions make the terminal better for everyone! 
+
+1.  **Fork** the repository.
+2.  **Submit** a pull request with your improvements.
+3.  *For major changes:* Please **open an issue** first to discuss your ideas so we can stay aligned on the project goals.
+
+License
+Apache License 2.0
+
