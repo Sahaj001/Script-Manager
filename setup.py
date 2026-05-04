@@ -24,7 +24,7 @@ def read_file():
 
 setup(
     name="command-manager-util",
-    version="1.0.0",
+    version="1.1.0",
     description="Manages useful commands in one place using fzf",
     long_description=read_file(),
     long_description_content_type="text/markdown",
