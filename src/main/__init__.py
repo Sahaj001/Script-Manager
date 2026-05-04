@@ -60,21 +60,41 @@ def add_new_command(commands, category=None):
         print(f"echo '✅ Added to {target_cat}'")
 
 
-def delete_category(commands):
-    """Handles wiping an entire category."""
-    categories = sorted(list(set(c[0] for c in commands)))
-    if not categories:
-        print("echo 'No categories to delete!'")
-        return commands
+def delete_logic(commands, category=None):
+    """Handles deletion of an entire category or a single command."""
+    # 1. DELETE WHOLE CATEGORY (if no specific category is passed)
+    if category is None:
+        categories = sorted(list(set(c[0] for c in commands)))
+        if not categories:
+            print("echo 'No categories to delete!'")
+            return
 
-    cat_to_wipe = run_fzf(categories, "SELECT CATEGORY TO WIPE ENTIRELY")
-    if cat_to_wipe:
-        conf = prompt_user(f"Delete ALL commands in [{cat_to_wipe}]? (y/n)")
-        if conf.lower() == "y":
-            commands = [c for c in commands if c[0] != cat_to_wipe]
-            save_commands(commands)
-            print(f"echo '❌ Category [{cat_to_wipe}] deleted!'")
-    return commands
+        cat_to_wipe = run_fzf(categories, "SELECT CATEGORY TO WIPE ENTIRELY")
+        if cat_to_wipe:
+            conf = prompt_user(f"Delete ALL commands in [{cat_to_wipe}]? (y/n)")
+            if conf and conf.lower() == "y":
+                updated_commands = [c for c in commands if c[0] != cat_to_wipe]
+                save_commands(updated_commands)
+                print(f"echo '❌ Category [{cat_to_wipe}] deleted!'")
+        return
+
+    # 2. DELETE SINGLE COMMAND (if category is provided)
+    sub_cmds = [c for c in commands if c[0] == category]
+    cat_raw = [f"{c[1]} | {c[2]}" for c in sub_cmds]
+
+    to_delete_display = run_fzf(cat_raw, f"SELECT COMMAND TO DELETE FROM {category}")
+
+    if to_delete_display:
+        parts = [x.strip() for x in to_delete_display.split("|")]
+        if len(parts) >= 2:
+            d_name, d_cmd = parts[0], parts[1]
+            updated_commands = [
+                c
+                for c in commands
+                if not (c[0] == category and c[1] == d_name and c[2] == d_cmd)
+            ]
+            save_commands(updated_commands)
+            print(f"echo '❌ Deleted [{d_name}] from {category}'")
 
 
 def main():
@@ -95,13 +115,16 @@ def main():
             return
 
         if category == "[- Delete Category]":
-            delete_category(commands)
+            delete_logic(commands)
             return
 
         # 2. COMMAND LEVEL
         sub_cmds = [c for c in commands if c[0] == category]
         cmd_options = [f"{c[1]}|{c[2]}" for c in sub_cmds]
-        cmd_options += [f"[+ Add Command to {category}]"]
+        cmd_options += [
+            f"[+ Add Command to {category}]",
+            f"[- Delete Command from {category}]",
+        ]
 
         selection = run_fzf(cmd_options, f"Commands in {category}")
 
@@ -112,6 +135,11 @@ def main():
             add_new_command(commands, category)
             return
 
+            # --- NEW LOGIC CALL ---
+        if selection == f"[- Delete Command from {category}]":
+            delete_logic(commands, category)
+            return
+
         # 3. EXECUTE
-        print(selection.split("|", maxsplit=-1)[-1])
+        print(selection.split("|", maxsplit=2)[-1])
         break
