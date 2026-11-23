@@ -1,89 +1,123 @@
+# Script Command Manager (SCM)
+
 [![Publish Python Package to PyPI](https://github.com/Sahaj001/Script-Manager/actions/workflows/publish.yml/badge.svg)](https://github.com/Sahaj001/Script-Manager/actions/workflows/publish.yml)
+[![Pylint](https://github.com/Sahaj001/Script-Manager/actions/workflows/pylint.yml/badge.svg)](https://github.com/Sahaj001/Script-Manager/actions/workflows/pylint.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-# Script-Command-Manager (SCM)
-# 🚀 SCM Tool Guide
-
-A streamlined command manager for your terminal workflows.
+A fast, terminal-first command manager for organizing and running shell commands with `fzf`.
 
 ## Overview
 
-**SCM** is a high-performance CLI tool designed to catalog, manage, and execute complex shell commands through an intuitive fuzzy-finding interface. Built with Python and powered by `fzf`, it eliminates the need to remember arcane syntax or sift through endless history files.
+SCM helps you store frequently used shell commands by category and run them through an interactive fuzzy-search menu. It is designed for developers who want quick access to repeatable workflows without cluttering shell history manually.
 
 ## Features
-*   **Fuzzy Search Navigation**: Instant filtering of categories and commands using `fzf`.
-*   **Hierarchical Management**: Organize commands into custom categories (e.g., Work, Dev, Personal).
-*   **In-App Administration**: Add or delete commands and entire categories directly from the interface.
-*   **Shell History Integration**: Commands executed via SCM can be injected into your shell history for easy access later.
-*   **Mac-Optimized Core**: Robust file I/O designed to handle macOS-specific shell environments and `sed/grep` variations.
 
----
+- Fuzzy search with `fzf` for categories and commands
+- Hierarchical organization by category
+- In-app add/delete flows for commands and categories
+- Lightweight local storage in `~/.work_commands`
+- Simple shell integration for execution
+
+## Requirements
+
+- Python 3.6+
+- [`fzf`](https://github.com/junegunn/fzf)
+
+Install `fzf` on macOS:
+
+```bash
+brew install fzf
+```
 
 ## Installation
 
-### Prerequisites
-1.  **Python**: 3.6 or higher.
-2.  **fzf**: Must be installed on your system.
-    ```bash
-    brew install fzf
-    ```
+### From source (local development)
 
-### Local Setup
-1.  Clone the repository:
-    ```bash
-    git clone [https://github.com/Sahaj001/Script-Manager.git](https://github.com/Sahaj001/Script-Manager.git)
-    cd Script-Manager
-    ```
-2.  Install in editable mode:
-    ```bash
-    pip install -e .
-    ```
-
----
-
-## Configuration
-
-To enable command execution and history injection, add the following wrapper to your `~/.zshrc` or `~/.bashrc`:
 ```bash
-### SCM START ###
-rscm() {
-    local result=$(scm)
-    if [[ -n "$result" ]]; then
-        eval " $result"
-    fi
-}
-alias s='rscm'
-### SCM END ###
+git clone https://github.com/Sahaj001/Script-Manager.git
+cd Script-Manager
+pip install -e .
 ```
 
+## Shell Setup
 
----
-### 🚀 Usage
-> **Note**
-> Simply type `s` or `run_scm` in your terminal to launch the interactive menu.
+Add the following function/alias to your `~/.zshrc` or `~/.bashrc`:
 
+```bash
+scm_run() {
+  local result
+  result="$(scm)"
+  if [[ -n "$result" ]]; then
+    eval "$result"
+  fi
+}
 
----
+alias s='scm_run'
+```
 
-## 🛠 Features & Navigation
+Reload your shell config:
 
-*   **Select a Category:** Use the **arrow keys** to navigate or **start typing** to filter through your existing groups.
-*   **Execute:** Choose a specific command and hit `Enter` to run it directly in your current shell.
-*   **Management:**
-    *   `[+ Add New Category]` — Create a new group for your commands.
-    *   `[+ Add Command to...]` — Expand your library within a specific category.
-    *   `[-] Delete` — Prune old or unused commands and groups.
+```bash
+source ~/.zshrc   # or source ~/.bashrc
+```
 
----
+## Usage
 
+Run:
 
-## 🤝 Contributing
+```bash
+s
+```
 
-Contributions make the terminal better for everyone! 
+Navigation:
 
-1.  **Fork** the repository.
-2.  **Submit** a pull request with your improvements.
-3.  *For major changes:* Please **open an issue** first to discuss your ideas so we can stay aligned on the project goals.
+- Use arrow keys or type to filter
+- Press `Enter` to execute a selected command
+- Use `[+ Add New Category]` to create categories
+- Use `[+ Add Command to ...]` to add commands
+- Use delete options to remove commands/categories
 
-License
-Apache License 2.0
+## Data Storage
+
+Commands are stored locally at:
+
+```text
+~/.work_commands
+```
+
+Format per line:
+
+```text
+Category|Display Name|Shell Command
+```
+
+## Development
+
+Install in editable mode:
+
+```bash
+pip install -e .
+```
+
+Run lint:
+
+```bash
+pylint $(git ls-files '*.py') --disable=C0114,C0115,C0116,R1710,R0912,R1705
+```
+
+## Contributing
+
+Contributions are welcome.
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a pull request
+
+For major changes, open an issue first to discuss what you would like to change.
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE).
+
 
