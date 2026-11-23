@@ -13,7 +13,7 @@ def read_readme() -> str:
 
 setup(
     name="command-manager-util",
-    version="1.1.0",
+    version="1.1.1",
     description="Manage and execute shell commands from a categorized, fzf-powered menu.",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
