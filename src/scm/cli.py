@@ -1,29 +1,38 @@
-# main.py
-import subprocess
+"""CLI implementation for Script Command Manager (SCM)."""
+from __future__ import annotations
+
 import os
+import subprocess
 import sys
+from typing import List
+
 
 CONFIG_FILE = os.path.expanduser("~/.work_commands")
 
 
-def load_commands():
-    """Loods commadns"""
+def load_commands() -> List[List[str]]:
+    """Load commands from the config file."""
     if not os.path.exists(CONFIG_FILE):
         return []
+    commands: List[List[str]] = []
     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-        # Filter out empty lines and ensure 3 parts per line
-        return [line.strip().split("|") for line in f if line.strip() and "|" in line]
+        for line in f:
+            line = line.strip()
+            if not line or "|" not in line:
+                continue
+            commands.append(line.split("|", 2))
+    return commands
 
 
-def save_commands(commands):
-    """Save commands"""
+def save_commands(commands: List[List[str]]) -> None:
+    """Save commands to the config file."""
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         for cmd in commands:
             f.write("|".join(cmd) + "\n")
 
 
-def run_fzf(options, header):
-    """Run fuzzy finder"""
+def run_fzf(options: List[str], header: str) -> str | None:
+    """Run fuzzy finder and return the selected option."""
     input_str = "\n".join(options)
     try:
         with subprocess.Popen(
@@ -41,15 +50,15 @@ def run_fzf(options, header):
         return None
 
 
-def prompt_user(msg):
-    """Prompt to user"""
+def prompt_user(msg: str) -> str:
+    """Prompt the user for input."""
     sys.stderr.write(f"{msg}: ")
     sys.stderr.flush()
     return sys.stdin.readline().strip()
 
 
-def add_new_command(commands, category=None):
-    """Handles the UI and logic for adding a new command."""
+def add_new_command(commands: List[List[str]], category: str | None = None) -> None:
+    """Handle adding a new command via interactive prompts."""
     target_cat = category or prompt_user("Enter Category Name")
     name = prompt_user("Enter Display Name")
     cmd = prompt_user("Enter Bash Command")
@@ -60,11 +69,10 @@ def add_new_command(commands, category=None):
         print(f"echo '✅ Added to {target_cat}'")
 
 
-def delete_logic(commands, category=None):
-    """Handles deletion of an entire category or a single command."""
-    # 1. DELETE WHOLE CATEGORY (if no specific category is passed)
+def delete_logic(commands: List[List[str]], category: str | None = None) -> None:
+    """Handle deletion of a whole category or a single command."""
     if category is None:
-        categories = sorted(list(set(c[0] for c in commands)))
+        categories = sorted({c[0] for c in commands})
         if not categories:
             print("echo 'No categories to delete!'")
             return
@@ -78,15 +86,14 @@ def delete_logic(commands, category=None):
                 print(f"echo '❌ Category [{cat_to_wipe}] deleted!'")
         return
 
-    # 2. DELETE SINGLE COMMAND (if category is provided)
     sub_cmds = [c for c in commands if c[0] == category]
     cat_raw = [f"{c[1]} | {c[2]}" for c in sub_cmds]
 
     to_delete_display = run_fzf(cat_raw, f"SELECT COMMAND TO DELETE FROM {category}")
 
     if to_delete_display:
-        parts = [x.strip() for x in to_delete_display.split("|")]
-        if len(parts) >= 2:
+        parts = [x.strip() for x in to_delete_display.split("|", 1)]
+        if len(parts) == 2:
             d_name, d_cmd = parts[0], parts[1]
             updated_commands = [
                 c
@@ -97,13 +104,12 @@ def delete_logic(commands, category=None):
             print(f"echo '❌ Deleted [{d_name}] from {category}'")
 
 
-def main():
-    """Main function - Orchestrates the menu navigation."""
+def main() -> None:
+    """Main entry point for the SCM CLI."""
     while True:
         commands = load_commands()
-        categories = sorted(list(set(c[0] for c in commands)))
+        categories = sorted({c[0] for c in commands})
 
-        # 1. CATEGORY LEVEL
         cat_options = categories + ["[+ Add New Category]", "[- Delete Category]"]
         category = run_fzf(cat_options, "Select Category (Esc to Exit)")
 
@@ -118,7 +124,6 @@ def main():
             delete_logic(commands)
             return
 
-        # 2. COMMAND LEVEL
         sub_cmds = [c for c in commands if c[0] == category]
         cmd_options = [f"{c[1]}|{c[2]}" for c in sub_cmds]
         cmd_options += [
@@ -135,11 +140,13 @@ def main():
             add_new_command(commands, category)
             return
 
-            # --- NEW LOGIC CALL ---
         if selection == f"[- Delete Command from {category}]":
             delete_logic(commands, category)
             return
 
-        # 3. EXECUTE
-        print(selection.split("|", maxsplit=2)[-1])
+        print(selection.split("|", 1)[-1])
         break
+
+
+if __name__ == "__main__":
+    main()
